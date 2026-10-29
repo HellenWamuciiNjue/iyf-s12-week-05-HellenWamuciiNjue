@@ -1,6 +1,6 @@
 ## Live Demo
 
-[View Live Site](https://okoyo13.github.io/iyf-s12-week-05-okoyo13/)
+[View Live Site](https://HellenWamuciiNjue.github.io/iyf-s12-week-05-HellenWamuciiNjue/)
 
 # JavaScript DOM Manipulation
 
