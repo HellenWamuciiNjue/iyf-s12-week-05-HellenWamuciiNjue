@@ -1,247 +1,221 @@
-// ============================================
-// LESSON 10 — CLASSWORK EXERCISE: To-Do List (the Week 5 deliverable)
-// index.html and styles.css are GIVEN. You write this file.
-// ============================================
+"use strict";
 
-// ---------- DOM elements (given) ----------
+// DOM Elements
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
-const formError = document.getElementById("form-error");
 const todoList = document.getElementById("todo-list");
 const itemsLeft = document.getElementById("items-left");
 const filters = document.querySelectorAll(".filter");
 const clearCompletedBtn = document.getElementById("clear-completed");
 
-// ---------- State (given) ----------
-let todos = [];            // [{ id, text, completed }]
-let currentFilter = "all"; // "all" | "active" | "completed"
+// State
+let todos = [];
+let currentFilter = "all";
 let nextId = 1;
-let editingId = null;      // Tracks which item is currently being edited
 
-
-// ============================================
-// STEP 1 — render the list from the array
-// ============================================
-
-// TODO 1a: createTodoElement(todo) returns an <li class="todo-item" data-id="…">
+// Create and return a task list item
 function createTodoElement(todo) {
-    const li = document.createElement("li");
-    li.className = "todo-item";
-    li.setAttribute("data-id", todo.id);
-    
-    if (todo.completed) {
-        li.classList.add("completed");
-    }
+  const li = document.createElement("li");
+  li.dataset.id = todo.id;
 
-    // Check if this specific item is currently in double-click edit mode
-    if (editingId === todo.id) {
-        const editInput = document.createElement("input");
-        editInput.type = "text";
-        editInput.className = "edit";
-        editInput.value = todo.text;
-        
-        // Save updates on hitting Enter or blur; cancel on Escape
-        editInput.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-                saveEdit(todo.id, editInput.value);
-            } else if (event.key === "Escape") {
-                editingId = null;
-                render();
-            }
-        });
-        
-        editInput.addEventListener("blur", () => {
-            saveEdit(todo.id, editInput.value);
-        });
+  if (todo.completed) {
+    li.classList.add("completed");
+  }
 
-        li.appendChild(editInput);
-        
-        // Auto-focus the input box as soon as it mounts on screen
-        setTimeout(() => editInput.focus(), 0);
-    } else {
-        // Normal list viewing layout view
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "toggle";
-        checkbox.checked = todo.completed;
+  const span = document.createElement("span");
+  span.classList.add("todo-text");
+  span.textContent = todo.text;
+  span.title = "Click to complete or undo; double-click to edit";
 
-        const span = document.createElement("span");
-        span.className = "todo-text";
-        span.textContent = todo.text; // Safe text rendering avoids XSS hooks
+  const deleteButton = document.createElement("button");
+  deleteButton.type = "button";
+  deleteButton.classList.add("delete-btn");
+  deleteButton.textContent = "Delete";
+  deleteButton.setAttribute("aria-label", "Delete " + todo.text);
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.type = "button";
-        deleteBtn.className = "delete";
-        deleteBtn.textContent = "✕";
-        deleteBtn.setAttribute("aria-label", `Delete "${todo.text}"`);
+  li.appendChild(span);
+  li.appendChild(deleteButton);
 
-        li.appendChild(checkbox);
-        li.appendChild(span);
-        li.appendChild(deleteBtn);
-    }
-
-    return li;
+  return li;
 }
 
-// Helper to save double-click inline text modifications cleanly
-function saveEdit(id, newText) {
-    const trimmed = newText.trim();
-    const targetTodo = todos.find(t => t.id === id);
-    
-    if (targetTodo) {
-        if (trimmed !== "") {
-            targetTodo.text = trimmed;
-        }
-    }
-    editingId = null;
-    render();
+// Display tasks according to the selected filter
+function renderTodos() {
+  todoList.replaceChildren();
+
+  let filteredTodos = todos;
+
+  if (currentFilter === "active") {
+    filteredTodos = todos.filter((todo) => !todo.completed);
+  } else if (currentFilter === "completed") {
+    filteredTodos = todos.filter((todo) => todo.completed);
+  }
+
+  filteredTodos.forEach((todo) => {
+    todoList.appendChild(createTodoElement(todo));
+  });
+
+  updateStats();
 }
 
-// TODO 1b: visibleTodos() returns todos filtered by currentFilter
-function visibleTodos() {
-    if (currentFilter === "active") {
-        return todos.filter(todo => !todo.completed);
-    } else if (currentFilter === "completed") {
-        return todos.filter(todo => todo.completed);
-    }
-    return todos; // Returns everything if filter status is "all"
-}
-
-// TODO 1c: render() — replace the list's children with the visible todos, then updateStats()
-function render() {
-    todoList.replaceChildren(...visibleTodos().map(createTodoElement));
-    updateStats();
-}
-
-// TODO 1d: updateStats() — "1 item left" / "3 items left" (watch the plural)
-function updateStats() {
-    const activeCount = todos.filter(todo => !todo.completed).length;
-    if (activeCount === 1) {
-        itemsLeft.textContent = "1 item left";
-    } else {
-        itemsLeft.textContent = `${activeCount} items left`;
-    }
-}
-
-
-// ============================================
-// STEP 2 — add a task
-// ============================================
-
-// TODO 2a: addTodo(text) — push { id: nextId++, text, completed: false }, then render()
+// Add a task
 function addTodo(text) {
-    todos.push({
-        id: nextId++,
-        text: text,
-        completed: false
-    });
-    render();
+  const trimmedText = text.trim();
+
+  if (trimmedText === "") {
+    return;
+  }
+
+  todos.push({
+    id: nextId++,
+    text: trimmedText,
+    completed: false,
+  });
+
+  input.value = "";
+  renderTodos();
+  input.focus();
 }
 
-// TODO 2b: listen for SUBMIT on the form
-form.addEventListener("submit", (event) => {
-    event.preventDefault(); // Prevents full browser page reload cycle refresh
-    
-    const rawValue = input.value.trim();
-    if (rawValue === "") {
-        formError.textContent = "Type a task first.";
-    } else {
-        formError.textContent = ""; // Reset application error field states
-        addTodo(rawValue);
-        input.value = "";
-        input.focus();
-    }
-});
-
-
-// ============================================
-// STEP 3 — toggle and delete with ONE delegated listener
-// ============================================
-
-// TODO 3a: toggleTodo(id) and deleteTodo(id) — change the array, then render()
+// Toggle a task's completed state
 function toggleTodo(id) {
-    const todo = todos.find(t => t.id === id);
-    if (todo) {
-        todo.completed = !todo.completed;
-    }
-    render();
+  const todo = todos.find((todo) => todo.id === id);
+
+  if (todo) {
+    todo.completed = !todo.completed;
+    renderTodos();
+  }
 }
 
+// Delete a task
 function deleteTodo(id) {
-    todos = todos.filter(todo => todo.id !== id);
-    render();
+  todos = todos.filter((todo) => todo.id !== id);
+  renderTodos();
 }
 
-// TODO 3b: ONE click listener on todoList (Event Delegation model layout)
-todoList.addEventListener("click", (event) => {
-    const item = event.target.closest(".todo-item");
-    if (!item) return;
+// Update the number of incomplete tasks
+function updateStats() {
+  const remaining = todos.filter((todo) => !todo.completed).length;
+  itemsLeft.textContent =
+    remaining + (remaining === 1 ? " item left" : " items left");
+}
 
-    const id = Number(item.dataset.id);
-
-    // Explicitly check for delete click triggers before modifying completed statuses
-    if (event.target.classList.contains("delete")) {
-        deleteTodo(id);
-        return;
-    }
-    
-    // Check if the click target isn't an input field while toggling completed classes
-    if (!event.target.classList.contains("edit")) {
-        toggleTodo(id);
-    }
-});
-
-
-// ============================================
-// STEP 4 — filters, stats, clear completed
-// ============================================
-
-// TODO 4a: filterTodos(filter) — set currentFilter; manage visual UI button attribute weights
+// Change the active filter
 function filterTodos(filter) {
-    currentFilter = filter;
-    
-    filters.forEach(btn => {
-        if (btn.dataset.filter === filter) {
-            btn.classList.add("active");
-            btn.setAttribute("aria-pressed", "true");
-        } else {
-            btn.classList.remove("active");
-            btn.setAttribute("aria-pressed", "false");
-        }
-    });
-    
-    render();
+  currentFilter = filter;
+
+  filters.forEach((button) => {
+    button.classList.toggle("active", button.dataset.filter === filter);
+  });
+
+  renderTodos();
 }
 
-// TODO 4b: a click listener on each filter button
-filters.forEach(btn => {
-    btn.addEventListener("click", () => {
-        filterTodos(btn.dataset.filter);
-    });
+// Handle adding tasks with the form
+form.addEventListener("submit", function (event) {
+  event.preventDefault();
+  addTodo(input.value);
 });
 
-// TODO 4c: clearCompleted() — keep only !completed; render()
-function clearCompleted() {
-    todos = todos.filter(todo => !todo.completed);
-    render();
-}
+// Event delegation for task clicks and deletion
 
-clearCompletedBtn.addEventListener("click", clearCompleted);
+let clickTimer;
 
+todoList.addEventListener("click", function (event) {
+  const li = event.target.closest("li");
 
-// ============================================
-// STEP 5 — BONUS: double-click to edit
-// ============================================
-todoList.addEventListener("dblclick", (event) => {
-    if (event.target.classList.contains("todo-text")) {
-        const item = event.target.closest(".todo-item");
-        if (item) {
-            editingId = Number(item.dataset.id);
-            render();
-        }
+  if (!li || !todoList.contains(li)) {
+    return;
+  }
+
+  const id = Number(li.dataset.id);
+
+  if (event.target.closest(".delete-btn")) {
+    clearTimeout(clickTimer);
+    deleteTodo(id);
+    return;
+  }
+
+  if (event.target.closest(".todo-text")) {
+    clearTimeout(clickTimer);
+
+    clickTimer = setTimeout(function () {
+      toggleTodo(id);
+    }, 250);
+  }
+});
+
+// Filter button listeners
+filters.forEach((button) => {
+  button.addEventListener("click", function () {
+    filterTodos(button.dataset.filter);
+  });
+});
+
+// Remove all completed tasks
+clearCompletedBtn.addEventListener("click", function () {
+  todos = todos.filter((todo) => !todo.completed);
+  renderTodos();
+});
+
+// Bonus: Edit task text on double-click
+todoList.addEventListener("dblclick", function (event) {
+  clearTimeout(clickTimer);
+
+  const span = event.target.closest(".todo-text");
+
+  if (!span) {
+    return;
+  }
+
+  const li = span.closest("li");
+  const id = Number(li.dataset.id);
+  const todo = todos.find((todo) => todo.id === id);
+
+  if (!todo) {
+    return;
+  }
+
+  const editInput = document.createElement("input");
+  editInput.type = "text";
+  editInput.value = todo.text;
+  editInput.classList.add("todo-text");
+
+  span.replaceWith(editInput);
+  editInput.focus();
+  editInput.setSelectionRange(editInput.value.length, editInput.value.length);
+
+  let finished = false;
+
+  function finishEditing(save) {
+    if (finished) {
+      return;
     }
+
+    finished = true;
+
+    const newText = editInput.value.trim();
+
+    if (save && newText !== "") {
+      todo.text = newText;
+    }
+
+    renderTodos();
+  }
+
+  editInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      finishEditing(true);
+    } else if (event.key === "Escape") {
+      finishEditing(false);
+    }
+  });
+
+  editInput.addEventListener("blur", function () {
+    finishEditing(true);
+  });
 });
 
-
-// ---------- Initialize ----------
-render();
+// Initial display
+renderTodos();
