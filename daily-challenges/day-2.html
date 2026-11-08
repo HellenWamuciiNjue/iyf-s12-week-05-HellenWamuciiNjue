@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 2 Challenge: Node Creation</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 8px; margin: 4px 0; background: #e2e8f0; border-left: 4px solid #3182ce; }
+    </style>
+</head>
+<body>
+    <h1>Day 2: Log Operations Workspace</h1>
+    <button id="log-btn">Add Production Log</button>
+    <ul id="log-container"></ul>
+
+    <script>
+        const btn = document.getElementById('log-btn');
+        const container = document.getElementById('log-container');
+        let counter = 1;
+
+        btn.addEventListener('click', () => {
+            const li = document.createElement('li');
+            li.textContent = `Log Entry #${counter++}: Nitas POS Instance initialization trace completed at ${new Date().toLocaleTimeString()}`;
+            container.appendChild(li);
+        });
+    </script>
+</body>
+</html>

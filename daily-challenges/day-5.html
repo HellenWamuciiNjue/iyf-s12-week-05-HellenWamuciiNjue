@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 5 Challenge: Central Event Delegation Tracker</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .grid-panel { display: flex; gap: 10px; padding: 20px; background: #e2e8f0; border-radius: 6px; }
+        .node-tile { padding: 15px; background: white; border: 1px solid #cbd5e0; cursor: pointer; user-select: none; }
+        .selected { background: #4a5568; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Day 5: Single Listener Delegation Node</h1>
+    
+    <!-- One event listener will be assigned directly to this parent element container -->
+    <div id="parent-panel" class="grid-panel">
+        <div class="node-tile" data-unit="Desk A">LeaveDesk Terminal A</div>
+        <div class="node-tile" data-unit="Desk B">LeaveDesk Terminal B</div>
+        <div class="node-tile" data-unit="Desk C">LeaveDesk Terminal C</div>
+    </div>
+
+    <script>
+        // Implements the unified delegation design pattern
+        document.getElementById('parent-panel').addEventListener('click', (event) => {
+            const tile = event.target.closest('.node-tile');
+            if (!tile) return;
+            
+            tile.classList.toggle('selected');
+            console.log(`Routed operational signal for element tracking block: ${tile.dataset.unit}`);
+        });
+    </script>
+</body>
+</html>

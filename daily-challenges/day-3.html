@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 3 Challenge: Box Model Adjustment</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box-sandbox {
+            width: 250px;
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid #333;
+            background: #fff3cd;
+            transition: all 0.3s ease;
+        }
+        .expanded {
+            padding: 30px;
+            margin: 25px;
+            border-width: 5px;
+            background: #d1ecf1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Day 3: Box Model Sandbox</h1>
+    <button id="toggle-box">Mutate Box Metrics</button>
+    <div id="sandbox" class="box-sandbox">
+        <strong>Box Model Blueprint</strong>
+        <p>Observe padding, margins, and borders shift dynamically.</p>
+    </div>
+
+    <script>
+        document.getElementById('toggle-box').addEventListener('click', () => {
+            const sandbox = document.getElementById('sandbox');
+            sandbox.classList.toggle('expanded');
+        });
+    </script>
+</body>
+</html>

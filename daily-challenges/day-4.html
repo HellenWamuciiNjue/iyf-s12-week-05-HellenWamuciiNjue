@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 4 Challenge: XSS Sandbox Defenses</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .output-box { padding: 10px; border: 1px dashed #777; background: #eee; min-height: 40px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Day 4: Secure Automation Logs</h1>
+    <input type="text" id="script-input" value="<img src='x' onerror='alert(\"Exploit!\")'>" style="width: 350px;">
+    <button id="bind-btn">Apply Injection Filter</button>
+    
+    <div class="output-box" id="secure-output"></div>
+
+    <script>
+        document.getElementById('bind-btn').addEventListener('click', () => {
+            const rawString = document.getElementById('script-input').value;
+            const outputElement = document.getElementById('secure-output');
+            
+            // Using textContent explicitly deactivates and neutralizes string injections
+            outputElement.textContent = `Filtered Output Content: ${rawString}`;
+        });
+    </script>
+</body>
+</html>

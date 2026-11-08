@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 1 Challenge: Node Selection</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+        .system-card { padding: 15px; border: 1px solid #ccc; background: white; margin-bottom: 10px; }
+        .highlight { background: #d4edda; border-color: #c3e6cb; }
+    </style>
+</head>
+<body>
+    <h1>Day 1: Node Target Scans</h1>
+    <div class="system-card" id="target-card">
+        <h3>POS Database Console</h3>
+        <p class="status">System Status: Active</p>
+        <button id="inspect-btn">Run Scan</button>
+    </div>
+
+    <script>
+        document.getElementById('inspect-btn').addEventListener('click', () => {
+            const card = document.querySelector('#target-card');
+            const statusText = card.querySelector('.status');
+            
+            card.classList.add('highlight');
+            statusText.textContent = "Status Check: Core System Verifications Clear!";
+            console.log("Successfully targeted nodes via DOM methods.");
+        });
+    </script>
+</body>
+</html>
