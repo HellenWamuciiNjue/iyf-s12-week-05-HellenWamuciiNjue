@@ -13,7 +13,7 @@ const filters = document.querySelectorAll(".filter");
 const clearCompletedBtn = document.getElementById("clear-completed");
 
 // ---------- State (given) ----------
-let todos = [];            // [{ id, text, completed }]
+const STORAGE_KEY = "week5-todos";  let todos = [];  try {     todos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (error) {     todos = []; }  let currentFilter = "all"; let nextId = todos.reduce(     (max, todo) => Math.max(max, Number(todo.id) || 0), 0 ) + 1; let editingId = null;            // [{ id, text, completed }]
 let currentFilter = "all"; // "all" | "active" | "completed"
 let nextId = 1;
 let editingId = null;      // Tracks which item is currently being edited
@@ -109,6 +109,8 @@ function visibleTodos() {
 
 // TODO 1c: render() — replace the list's children with the visible todos, then updateStats()
 function render() {
+     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+
     todoList.replaceChildren(...visibleTodos().map(createTodoElement));
     updateStats();
 }
